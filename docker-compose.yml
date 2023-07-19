@@ -1,31 +1,51 @@
 version: '3.7'
 services: 
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.6.0
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.6.0
     volumes:
-      - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
-
+      - ./metricbeat/config/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      #- ./metricbeat/modules.d:/usr/share/metricbeat/modules.d
+      
     depends_on: 
+      - elasticsearch    
       - logstash
-      - elasticsearch
+      - kibana # solo asegura que se levanta el contenedor, no el servicio que lo aloja... => hay q esperar.
+
+  #filebeat:
+  #  image: docker.elastic.co/beats/filebeat:7.6.0
+  #  volumes:
+  #    - ./filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml
+  #    - ./logs:/usr/share/logs
+
+  #  depends_on: 
+  #    - logstash
+  #    - elasticsearch
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.6.0
     volumes:
-      #- ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
       - ./logstash/config/test.yml:/usr/share/logstash/logstash.yml
     depends_on:
       - elasticsearch
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    # container_name: es-1
     environment:
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"    
+      #- cluster.name=es-cluster           # set de cluster name
+      #- node.name=elasticsearch1          # sets node name
+      #- network.host=0.0.0.0              # sets binding ip to all
+      #- "xpack.security.enabled=false"    # disables xpack security
+      #- "xpack.monitoring.enabled=false"  # disables xpack monitoring
+      #- "xpack.watcher.enabled=false"     # disables xpack watcher
+      #- "xpack.ml.enabled=false"          # disables xpac machine learning     
+      - bootstrap.memory_lock=true        # disables memory swp
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # sets allocated memory  
       - discovery.type=single-node
     volumes:
       - ./elasticsearch/data:/usr/share/elasticsearch/data
-      - ./elasticsearch/config/elasticsearch.docker.yml:/user/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ulimits:
       memlock:
         soft: -1
@@ -37,7 +57,9 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.6.0
+    container_name: kb
     volumes:
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - 5601:5601
+    

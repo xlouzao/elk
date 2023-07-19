@@ -6,6 +6,6 @@ input {
 
 output {
   elasticsearch {
-    host => "localhost:9200"
+    hosts => "localhost:9200"
   }
 }
