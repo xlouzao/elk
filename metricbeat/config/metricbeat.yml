@@ -7,10 +7,11 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
-# queue_mem:
-#   events: 4096
-#   flush_min_events: 512
-#   flush_timeout: 5s
+# cola de eventos para el envío de info..
+queue_mem:
+  events: 4096
+  flush_min_events: 512
+  flush_timeout: 5s
 
 #==========================  Modules configuration ============================
 
@@ -141,7 +142,7 @@ output.elasticsearch:
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
-# Set to true to enable the monitoring reporter.
+# Set to true to enable the monitoring reporter of metricbeat.
 xpack.monitoring.enabled: true
 
 # Uncomment to send the metrics to Elasticsearch. Most settings from the

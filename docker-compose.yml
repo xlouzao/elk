@@ -4,7 +4,10 @@ services:
     image: docker.elastic.co/beats/metricbeat:7.6.0
     volumes:
       - ./metricbeat/config/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-      #- ./metricbeat/modules.d:/usr/share/metricbeat/modules.d
+      - ./metricbeat/tmp:/tmp
+      - ./metricbeat/modules.d:/usr/share/metricbeat/modules.d
+      - /var/run/docker.sock:/var/run/docker.sock
+
       
     depends_on: 
       - elasticsearch    
